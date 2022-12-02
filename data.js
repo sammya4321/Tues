@@ -1,70 +1,33 @@
-/* This file contains proxy data to simulate the data pulled from Contentful. */
+/* 
+ * This file contains constants the client required for pulling content from
+ * Contentful. 
+ */
 
-import { mediaTypes } from "./common.js";
+/* Constants */
+// The page is split into sevenths - with a fourteenth on the far left and right
+// and six in the centre. The left and right panels are evenly split with 3 each.
+// Text takes 2 columns and the media takes 3. Defining it here rather than in
+// css is to allow individual panels to easily overwrite the norm if required in
+// the future.
+export const constants = {
+    PANEL_COLUMNS: 3,       // left and right panels take 3 columns each
+    SMALL_IMAGE_WIDTH: 1/2, // small pic above text - 1/2 a column
+    TEXT_COLUMNS: 2,        // text on left takes 2 columns
+    MEDIA_COLUMNS: 3,       // media takes 3 columns
+    IMG_LOOP_DELAY: 1,      // delay for 1 sec between image loops
+    PANEL_LIST: {name: "Intro and Singles", id: "qzEshFK2djTS5a6BfYUVq"}, // This is the Entry ID for the panel list so that we know what panels to show in what order.
+    BANNER_PATH: "assets/intro/spinny.mp4"  // keeping this local for now
+}
 
-const introPanel = {
-    panelName: {name: "Intro", display: false},
-    bannerImg: {type: mediaTypes.VID, path: "assets/intro/spinny.mp4"},
-    text: {
-        pic: {path: 'assets/intro/flower.svg', width: 0.5},
-        contents: `
-        'tues.' (chews/choose) sounds like cheap wine and daydreams; close friends in small rooms between the city and a grey beach.
-
-        'tues.' is Ben Deans (production) and Owen Sutcliffe (words). The pair have been making music together for a decade in various projects, and 'tues.' is the culmination of that work.
-
-        Shifting; spitting; lamenting; prodding; this music exists somewhere between rap and everything else.
-
-        Written and fully self-produced in Glasgow, these songs are instinctive.
-
-        'tues.' wisely.
-        `,
-        width: 2
-    },
-    media: {
-        type: mediaTypes.IMGS,
-        width: 3,
-        content: {
-            autoLoopDelay: 1,
-            urls: ["assets/intro/ben_and_owen_stumps1.JPG", "assets/intro/ben_and_owen_stumps2.JPG"],
-            track: null
-        }
-    }
+export const mediaTypes = {
+    VID: 0,
+    IMGS: 1,
 };
 
-const singleExample = {
-    panelName: {name: "TWO SUDDEN", display: true},
-    text: {
-        // pic: {path: 'assets/two-sudden/two-sudden.png', width: 1},
-        pic: false,
-        contents: `
-        It's all deep colours and I'm torchlit.
-
-        'Two Sudden' is the first single from Glasgow alternative rap duo 'tues.'
-
-        It is an unsettled stumble through dense woodland. It is looking over your shoulder. 
-        
-        It is wondering who you are and who you've been. It is pausing on the edge of the forest, weighing up the dark behind and the city ahead.
-
-        A pulsing, plodding baseline and minimal percussion carry the song forward. The narrative begins as brooding and grows more frantic, anxious as the song progresses. 
-
-        Inspired by grey days in Scotland, ramshackle dens and the films of Ben Wheately; 
-
-        'Two Sudden' is here. 
-        `,
-        width: 2
-    },
-    media: {
-        type: mediaTypes.VID,
-        width: 3,
-        content: {
-            url: "assets/two-sudden/trailer.mp4",
-            thumbnail: "assets/two-sudden/poster.png"
-        }
-    }
-};
-
-export const example_data = {
-    textSizes: {headers: null, body: null},
-    panelSizes: {leftPanel: 3, rightPanel: 3},
-    panels: [introPanel, singleExample],
-};
+/* Load the Contentful client used for retrieving the content */
+export const client = contentful.createClient({
+    // This is the space ID.
+    space: "b2zbjs9kymaz",
+    // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
+    accessToken: "xJ2EZB3neDvXjs4PTcS7u5Qzv23uksfvsLe70q2bFOU"
+});

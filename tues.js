@@ -1,8 +1,8 @@
 'use strict';
 
-import { example_data } from "./data.js";
-import { mediaTypes } from "./common.js";
-import { debug } from "./debug.js";
+const { useState, useEffect } = React;
+
+import { client, constants, mediaTypes } from "./data.js";
 
 class ImgLoop extends React.Component {
   constructor(props) {
@@ -24,11 +24,18 @@ class ImgLoop extends React.Component {
   }
 
   render() {
-    return ( <img 
-      className="media"
-      style={{width: `calc(var(--column-size)*${this.props.images.width})`}}
-      src={this.props.images.content.urls[this.state.imgIndex]}/>
+    let ret = this.props.images.content.urls.map(
+      (url, index) => <img
+        className="media"
+        src={url}
+        key={index}
+        style={{
+          width: `calc(var(--column-size)*${this.props.images.width})`,
+          visibility: (index == this.state.imgIndex) ? "visible" : "hidden" 
+        }}
+      />
     );
+    return ret;
   }
 }
 
@@ -65,14 +72,11 @@ class Vid extends React.Component {
 function PanelMedia(props) {
   switch ( props.media.type ) {
     case mediaTypes.IMGS:
-      dbg.log('media will be imgs');
       if (props.media.content.autoLoopDelay > 0) {
         return <ImgLoop images={props.media}/>;
       }
       break;
     case mediaTypes.VID:
-      // convert into a component that can handle states so that you can control
-      // when the controls are shown.
       return <Vid media={props.media}/>
     default:
       console.warn('unexpected mediaType');
@@ -95,15 +99,21 @@ function LeftImg(props) {
 }
 
 function PanelText(props) {
-  return(
-    <p 
-      style={{width: `calc(var(--column-size)*${props.content.width})`}}
-      className="text"
-      key={1}
-    >
-        {props.content.contents}
-    </p>
-  )
+  if (props.content.text.contents.find(elm => elm.content.length > 1))
+  {console.warn('Might have missed some text content?!'); console.log(props);}
+
+  let text = props.content.text.contents.map( (elm, i) => {
+    return (
+      <p 
+        style={{width: `calc(var(--column-size)*${props.content.text.width})`}}
+        className="text"
+        key={i}
+      >
+        {elm.content[0].value}
+      </p>
+    )
+  })
+  return( <>{text}</> )
 }
 
 function PanelBanner(props) {
@@ -134,12 +144,8 @@ function PanelTitle(props) {
 
 function Panel(props) {
   let panelData = props.panel;
-
-  dbg.log(`rendering ${panelData.panelName.name}`);
-
   let panel = (
     <div className="panel">
-      <PanelBanner img={panelData.bannerImg}/>
       <div 
         className="left-panel"
         style={{width: `calc(var(--column-size) * ${props.columns.leftPanel})`}}
@@ -166,20 +172,69 @@ function Tues(props) {
   let content = [];
   let tuesData;
 
-  function getData() {
-    return example_data;
+  const [panels, setPanels] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  /* Fetch the 'Intro and  Singles' list from Contentful  */
+  useEffect(() => {
+    client.getEntry(constants.PANEL_LIST.id)
+      .then( (response) => {
+        let panelsData = response.fields.introAndSingles.map((rawPanel) => {
+          let singlePanelData = {
+            panelName: {name: rawPanel.fields.title, display: rawPanel.fields.displayTitle},
+            text: {
+              pic:  {path: rawPanel.fields?.smallImage?.fields?.file?.url, width: constants.SMALL_IMAGE_WIDTH},
+              text: {contents: rawPanel.fields.description.content, width: constants.TEXT_COLUMNS},
+            }
+          };
+          
+          if ( rawPanel.fields.largeImage ) {
+            singlePanelData.media = {
+              type: mediaTypes.IMGS,
+              width: constants.MEDIA_COLUMNS,
+              content: {
+                autoLoopDelay: constants.IMG_LOOP_DELAY,
+                urls: rawPanel.fields.largeImage.map((img) => img.fields.file.url)
+              }
+            }
+          }
+
+          if ( rawPanel.fields.video ) {
+            singlePanelData.media = {
+              type: mediaTypes.VID,
+              width: constants.MEDIA_COLUMNS,
+              content: {
+                url: rawPanel.fields.video.fields.file.url,
+                thumbnail: rawPanel.fields.videoThumbnail?.fields.file.url
+              }
+            }
+          }
+
+          return singlePanelData;
+        })
+        setPanels(panelsData);
+        setLoading(false);
+      })
+      .catch(console.error)
+  }, []);
+
+  if ( loading ) {
+    console.log('loading');
+    return ("Loading...");
   }
 
-  tuesData = getData();
+  tuesData = {
+    panelSizes: {leftPanel: constants.PANEL_COLUMNS, rightPanel: constants.PANEL_COLUMNS},
+    panels: panels
+  };
+  content.push(<PanelBanner key={0} img={{type: mediaTypes.VID, path: constants.BANNER_PATH}}/>);
   for (let i = 0; i < tuesData.panels.length; i++) {
     let panel = tuesData.panels[i];
-    content.push(<Panel panel={panel} key={i} columns={tuesData.panelSizes}/>);    
+    content.push(<Panel panel={panel} key={i+1} columns={tuesData.panelSizes}/>);    
   }
 
   return content;
 }
-
-let dbg = new debug(0);
 
 const domContainer = document.querySelector('#tues');
 const root = ReactDOM.createRoot(domContainer);
