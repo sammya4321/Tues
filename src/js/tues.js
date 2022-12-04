@@ -84,7 +84,7 @@ function PanelMedia(props) {
 }
 
 function LeftImg(props) {
-  if ( props.content.pic ) {
+  if ( props.content.pic.path ) {
     return (
       <img 
         className="text-img"
