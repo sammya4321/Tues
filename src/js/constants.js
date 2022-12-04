@@ -5,7 +5,7 @@
 // Text takes 2 columns and the media takes 3. Defining it here rather than in
 // css is to allow individual panels to easily overwrite the norm if required in
 // the future.
-const PANEL_COLUMNS = 3;       // left and right panels take 3 columns each
+export const PANEL_COLUMNS = 3;       // left and right panels take 3 columns each
 export const SMALL_IMAGE_WIDTH = 1/2; // small pic above text - 1/2 a column
 export const TEXT_COLUMNS = 2;        // text on left takes 2 columns
 export const MEDIA_COLUMNS = 3;       // media takes 3 columns
