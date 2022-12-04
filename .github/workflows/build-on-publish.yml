@@ -1,10 +1,10 @@
 # Sample workflow for building and deploying an SSG site to GitHub Pages
-name: Build and deploy on push
+name: Build and deploy on publish
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  # Runs when content published
+  repository_dispatch:
+    types: [publish-event]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
