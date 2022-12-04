@@ -54,10 +54,9 @@ mediaObj = {
                         * otherwise its the interval used in the loop */
     urls: [""], /* [str]: an array of strings for paths to the images to loop.
                  * can be an array of one element for a non looping image */
-    track: null,  /* str | null : Path to the track or null if no track */
 };
 
-/* if mediaObj (assigned to media.content) is of type IMGS it will have the
+/* if mediaObj (assigned to media.content) is of type VID it will have the
  * following fields */
 mediaObj = {
     url: "", /* str: paths to the images to the vid */

@@ -1,8 +1,7 @@
 'use strict';
 
-const { useState, useEffect } = React;
-
-import { client, constants, mediaTypes } from "./data.js";
+import * as constants from "./js/constants.js";
+import { data } from "./js/fetched_data.js";
 
 class ImgLoop extends React.Component {
   constructor(props) {
@@ -71,12 +70,12 @@ class Vid extends React.Component {
 
 function PanelMedia(props) {
   switch ( props.media.type ) {
-    case mediaTypes.IMGS:
+    case  constants.mediaTypes.IMGS:
       if (props.media.content.autoLoopDelay > 0) {
         return <ImgLoop images={props.media}/>;
       }
       break;
-    case mediaTypes.VID:
+    case  constants.mediaTypes.VID:
       return <Vid media={props.media}/>
     default:
       console.warn('unexpected mediaType');
@@ -119,13 +118,13 @@ function PanelText(props) {
 function PanelBanner(props) {
   if ( props.img ) {
     switch ( props.img.type ) {
-      case mediaTypes.VID:
+      case  constants.mediaTypes.VID:
         return (
           <video className="banner" loop autoPlay muted>
               <source src={props.img.path} type="video/mp4"/>
           </video>
         );
-      case mediaTypes.IMGS:
+      case  constants.mediaTypes.IMGS:
         console.warn('mediaType.IMGS not yet implemented for PanelBanner');
         break;
       default:
@@ -172,62 +171,11 @@ function Tues(props) {
   let content = [];
   let tuesData;
 
-  const [panels, setPanels] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  /* Fetch the 'Intro and  Singles' list from Contentful  */
-  useEffect(() => {
-    client.getEntry(constants.PANEL_LIST.id)
-      .then( (response) => {
-        let panelsData = response.fields.introAndSingles.map((rawPanel) => {
-          let singlePanelData = {
-            panelName: {name: rawPanel.fields.title, display: rawPanel.fields.displayTitle},
-            text: {
-              pic:  {path: rawPanel.fields?.smallImage?.fields?.file?.url, width: constants.SMALL_IMAGE_WIDTH},
-              text: {contents: rawPanel.fields.description.content, width: constants.TEXT_COLUMNS},
-            }
-          };
-          
-          if ( rawPanel.fields.largeImage ) {
-            singlePanelData.media = {
-              type: mediaTypes.IMGS,
-              width: constants.MEDIA_COLUMNS,
-              content: {
-                autoLoopDelay: constants.IMG_LOOP_DELAY,
-                urls: rawPanel.fields.largeImage.map((img) => img.fields.file.url)
-              }
-            }
-          }
-
-          if ( rawPanel.fields.video ) {
-            singlePanelData.media = {
-              type: mediaTypes.VID,
-              width: constants.MEDIA_COLUMNS,
-              content: {
-                url: rawPanel.fields.video.fields.file.url,
-                thumbnail: rawPanel.fields.videoThumbnail?.fields.file.url
-              }
-            }
-          }
-
-          return singlePanelData;
-        })
-        setPanels(panelsData);
-        setLoading(false);
-      })
-      .catch(console.error)
-  }, []);
-
-  if ( loading ) {
-    console.log('loading');
-    return ("Loading...");
-  }
-
   tuesData = {
     panelSizes: {leftPanel: constants.PANEL_COLUMNS, rightPanel: constants.PANEL_COLUMNS},
-    panels: panels
+    panels: data
   };
-  content.push(<PanelBanner key={0} img={{type: mediaTypes.VID, path: constants.BANNER_PATH}}/>);
+  content.push(<PanelBanner key={0} img={{type:  constants.mediaTypes.VID, path: constants.BANNER_PATH}}/>);
   for (let i = 0; i < tuesData.panels.length; i++) {
     let panel = tuesData.panels[i];
     content.push(<Panel panel={panel} key={i+1} columns={tuesData.panelSizes}/>);    

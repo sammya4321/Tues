@@ -1,0 +1,23 @@
+{
+  "name": "tues",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/ssg.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sammya4321/Tues.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sammya4321/Tues/issues"
+  },
+  "homepage": "https://github.com/sammya4321/Tues#readme",
+  "dependencies": {
+    "contentful": "^9.2.14"
+  }
+}
