@@ -2,3 +2,5 @@
 node_modules
 .vscode
 .env 
+dist
+src/js/fetched_data.js

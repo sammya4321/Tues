@@ -1,0 +1,62 @@
+
+form {
+    padding-top: 50px;
+    width: 33vw;
+    min-width: 500px;
+    margin: auto;
+}
+
+input {
+    width: 100%;
+    padding: 5px;
+    /* display: inline-block; */
+    border: 2px solid black;
+    border-radius: 0px;   
+    background-color: white;
+}
+
+label > p {
+    margin-top: 20px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type=submit] {
+    border-radius: 0px;   
+    background-color: white;
+    color: black;
+    margin-top: 20px;
+    width: 75px;
+    min-width: 75px;
+}
+
+input[type=submit]:hover {
+    background-color: black;
+    color: white;
+}
+
+input[type=submit]:active {
+    background-color: white;
+    color: black;
+}
+
+input[type=checkbox]{
+    width: 50px;
+    margin-left: 0px;
+}
+
+.badDetails > label > * {
+    border-color: red;
+    color: red;
+}
+
+.goodDetails > label > * {
+    border-color: green;
+    color: green;
+}
+
+.goodDetails > input[type=submit] {
+    background-color: green;
+    color: white;
+    border: white;
+}
