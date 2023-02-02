@@ -1,7 +1,11 @@
 'use strict';
 
-import * as constants from "./js/constants.js";
-import { data } from "./js/fetched_data.js";
+import React from 'react';
+import * as common from "./common.js";
+import '../css/tues.css';
+import BANNER_PATH from '../assets/spinny.mp4'
+
+const constants = common.commonConstants;
 
 class ImgLoop extends React.Component {
   constructor(props) {
@@ -23,7 +27,7 @@ class ImgLoop extends React.Component {
   }
 
   render() {
-    let ret = this.props.images.content.urls.map(
+    const ret = this.props.images.content.urls.map(
       (url, index) => <img
         className="media"
         src={url}
@@ -167,23 +171,21 @@ function Panel(props) {
   return panel;
 }
 
-function Tues(props) {
+const Tues = props => {
   let content = [];
   let tuesData;
 
   tuesData = {
     panelSizes: {leftPanel: constants.PANEL_COLUMNS, rightPanel: constants.PANEL_COLUMNS},
-    panels: data
+    panels: props.panels
   };
-  content.push(<PanelBanner key={0} img={{type:  constants.mediaTypes.VID, path: constants.BANNER_PATH}}/>);
-  for (let i = 0; i < tuesData.panels.length; i++) {
-    let panel = tuesData.panels[i];
-    content.push(<Panel panel={panel} key={i+1} columns={tuesData.panelSizes}/>);    
-  }
 
+  content.push(<PanelBanner key={0} img={{type:  constants.mediaTypes.VID, path: BANNER_PATH}}/>);
+  content = content.concat(tuesData.panels.map((panel, i) => {
+    return (<Panel panel={panel} key={i+1} columns={tuesData.panelSizes}/>)
+  }));
+  
   return content;
 }
 
-const domContainer = document.querySelector('#tues');
-const root = ReactDOM.createRoot(domContainer);
-root.render(<Tues/>);
+export default Tues;

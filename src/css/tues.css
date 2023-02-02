@@ -41,12 +41,8 @@ img.media {
 }
 
 .panel-title {
-    font-weight: 200;
+    /* font-weight: 200; */
     margin-top: 0px;
-}
-
-.text {
-    line-height: 1.6;
 }
 
 :root {                     
