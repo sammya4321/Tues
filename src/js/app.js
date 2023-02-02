@@ -9,14 +9,16 @@ import { data } from "./fetched_data.js";
 
 /* routes */
 let page_contents;
-if (window.location.pathname === '/' || 
-    window.location.pathname === '/index.html' ||
-    window.location.pathname === '/index')
+
+// remove '/Tues' after moving from gh pages domain to custom domain
+if (window.location.pathname === '/Tues/' || 
+    window.location.pathname === '/Tues/index.html' ||
+    window.location.pathname === '/Tues/index')
 {
     page_contents = <Tues panels={data}/>;
 }
-else if (window.location.pathname === '/preview.html' ||
-         window.location.pathname === '/preview')
+else if (window.location.pathname === '/Tues/preview.html' ||
+         window.location.pathname === '/Tues/preview')
 {
     page_contents = <Preview/>;
 }
