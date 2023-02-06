@@ -139,14 +139,81 @@ function PanelBanner(props) {
 }
 
 function PanelTitle(props) {
-  if ( props.name.display ) {
+  if ( props.name.display === true ) {
     return <h1 className="panel-title">{props.name.name}</h1>;
   }
   return null;
 }
 
+function isPanelValid(panel) {
+  let ret = {errors: false, errMsgs: [], errComponents: []};
+  if (panel.panelName.error === true)
+  {
+    ret.errors = true;
+    ret.errMsgs.push(panel.panelName.errorMsg);
+    ret.errComponents.push("There was an error in the title");
+  }
+  if (panel.text.error === true)
+  {
+    ret.errors = true;
+    ret.errMsgs.push(panel.text.errorMsg);
+    ret.errComponents.push("There was an error in the text");
+  }
+  if (panel.media.error === true)
+  {
+    ret.errors = true;
+    ret.errMsgs.push(panel.media.errorMsg);
+    ret.errComponents.push("There was an error with the images or video");
+  }
+  return ret;
+}
+
+function PanelError(props) {
+  let summary;
+  if (props.error.errMsgs.length === 1) {
+    summary = `found an error in the panel '${props.panelData.panelName.name}'`;
+  } else if ( props.error.errMsgs.length > 1 ) {
+    summary = `found errors in the panel '${props.panelData.panelName.name}'`;
+  }
+  
+  if (props.display === true) {
+    let ret = [];
+    let key = 0;
+    if (props.panelData.panelName.error === false) {
+      ret.push(<h1 key={key}>{summary}</h1>)
+      key++;
+    }
+    props.error.errComponents.forEach((msg, i) => {ret.push(<p key={key+i} style={{fontWeight: 'bold'}}>{msg}</p>)});
+    key += props.error.errComponents.length;
+    props.error.errMsgs.forEach((err, i) => {ret.push(<p key={key+i} style={{fontWeight: 'bold'}}>{err}</p>)});
+    key += props.error.errMsgs.length;
+    return (
+      <div style={{width: '100vw', height: '100vh', border: '5px solid red'}}>
+        {ret}
+      </div>
+    )
+  } else {
+    if (props.panelData.panelName.error === false) {
+      console.log(summary);
+    }
+    props.error.errComponents.forEach(msg => console.log(msg));
+    props.error.errMsgs.forEach(err => console.error(err));
+    return null;
+  }
+}
+
 function Panel(props) {
   let panelData = props.panel;
+
+  const err = isPanelValid(panelData);
+  if (err.errors === true) {
+    return (<PanelError 
+      error={err} 
+      display={props.displayError} 
+      panelData={panelData}/>
+    )
+  }
+
   let panel = (
     <div className="panel">
       <div 
@@ -179,10 +246,16 @@ const Tues = props => {
     panelSizes: {leftPanel: constants.PANEL_COLUMNS, rightPanel: constants.PANEL_COLUMNS},
     panels: props.panels
   };
-
   content.push(<PanelBanner key={0} img={{type:  constants.mediaTypes.VID, path: BANNER_PATH}}/>);
   content = content.concat(tuesData.panels.map((panel, i) => {
-    return (<Panel panel={panel} key={i+1} columns={tuesData.panelSizes}/>)
+    return (
+      <Panel 
+        panel={panel} 
+        key={i+1}
+        columns={tuesData.panelSizes}
+        displayError={props.displayErrors}
+      />
+    )
   }));
   
   return content;

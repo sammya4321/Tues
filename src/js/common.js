@@ -20,32 +20,60 @@ const constants = {
 function mapContentfulResponseToTuesPanels(response) {
     const panelsData = response.fields.introAndSingles.map((rawPanel) => {
         let singlePanelData = {
-          panelName: {name: rawPanel.fields.title, display: rawPanel.fields.displayTitle},
-          text: {
+          panelName: {},
+          text: {},
+          media: {}
+        };
+
+        try {
+          singlePanelData.panelName = { 
+            name: rawPanel.fields.title, 
+            display: rawPanel.fields.displayTitle,
+            error: false
+          };
+        } catch(err) {
+          singlePanelData.panelName = { error: true, errorMsg: err.message };
+        }
+
+        try {
+          singlePanelData.text = { 
             pic:  {path: rawPanel.fields?.smallImage?.fields?.file?.url, width: constants.SMALL_IMAGE_WIDTH},
             text: {contents: rawPanel.fields.description.content, width: constants.TEXT_COLUMNS},
-          }
-        };
+            error: false
+          };
+        } catch(err) {
+          singlePanelData.text = { error: true, errorMsg: err.message };
+        }
         
         if ( rawPanel.fields.largeImage ) {
-          singlePanelData.media = {
-            type:  constants.mediaTypes.IMGS,
-            width: constants.MEDIA_COLUMNS,
-            content: {
-              autoLoopDelay: constants.IMG_LOOP_DELAY,
-              urls: rawPanel.fields.largeImage.map((img) => img.fields.file.url)
+          try {
+            singlePanelData.media = {
+              type:  constants.mediaTypes.IMGS,
+              width: constants.MEDIA_COLUMNS,
+              content: {
+                autoLoopDelay: constants.IMG_LOOP_DELAY,
+                urls: rawPanel.fields.largeImage.map((img) => img.fields.file.url)
+              },
+              error: false
             }
+          } catch (err) {
+            singlePanelData.media = { error: true, errorMsg: err.message };
           }
         }
     
         if ( rawPanel.fields.video ) {
-          singlePanelData.media = {
-            type:  constants.mediaTypes.VID,
-            width: constants.MEDIA_COLUMNS,
-            content: {
-              url: rawPanel.fields.video.fields.file.url,
-              thumbnail: rawPanel.fields.videoThumbnail?.fields.file.url
+          try {
+            singlePanelData.media = {
+              type:  constants.mediaTypes.VID,
+              width: constants.MEDIA_COLUMNS,
+              content: {
+                url: rawPanel.fields.video.fields.file.url,
+                thumbnail: rawPanel.fields.videoThumbnail?.fields.file.url
+              },
+              error: false
             }
+          } catch(err) {
+            singlePanelData.media = { error: true, errorMsg: err.message };
           }
         }
         return singlePanelData;

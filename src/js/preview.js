@@ -35,8 +35,7 @@ function login(space_id, cpa_token) {
         client.getEntry(common.commonConstants.PANEL_LIST.id)
         .then( (response) => {
             console.log('logged in');
-            const panels = common.commonFunctions.mapCtflRespToTues(response);
-            resolve(panels);
+            resolve(response);
         })
         .catch( (rej) => {
             console.error('failed to login');
@@ -62,13 +61,13 @@ function SignInForm(props) {
         // try log in, return tues if successful or highlight form red if wrong
         console.log(inputs);
         login(inputs.spaceID, inputs.cpaToken)
-        .then( (panels) => {
+        .then( (response) => {
             if (inputs.renemba) {
                 setCookie(SID_COOKIE_NAME, inputs.spaceID, 30);
                 setCookie(CPA_COOKIE_NAME, inputs.cpaToken, 30);       
             }
             setAttempt({bad: false, good: true});
-            props.setPanels({signedIn: true, data: panels});
+            props.setPanels({signedIn: true, data: response});
         })
         .catch( (resp) => {
             console.log(resp);
@@ -140,11 +139,11 @@ const Preview = props => {
             const space_id = getCookieValue(SID_COOKIE_NAME);
 
             login(space_id, cpa_token)
-            .then ( (panels) => {
+            .then ( (response) => {
                 console.log('logged in from previously stored cookies,  +30 days');
                 setCookie(SID_COOKIE_NAME, space_id, 30);
                 setCookie(CPA_COOKIE_NAME, cpa_token, 30);
-                setPanels({signedIn: true, data: panels});
+                setPanels({signedIn: true, data: response});
             } )
             .catch ( () => {
                 console.log('failed to log in with the provided cookies...');
@@ -165,7 +164,8 @@ const Preview = props => {
         if (panels.signedIn === false) {
             return <SignInForm setPanels={setPanels}></SignInForm>
         } else {
-            return <Tues panels={panels.data}/>;
+            const panelsData = common.commonFunctions.mapCtflRespToTues(panels.data);
+            return <Tues panels={panelsData} displayErrors={true}/>;
         }
     } else {
         console.log('loading...');

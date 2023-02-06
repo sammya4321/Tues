@@ -26,3 +26,5 @@ a prop to the `Tues` React component (src/js/tues.js).
 * Sort out custom domain
 * Add favicon
 * Add License
+* replace any width: {width} with a class: {class}, apply the style with a css 
+  class instead, use media queries to adjust layout for smaller screens

@@ -1,24 +1,23 @@
 'use strict';
 
-/* imports */
 import ReactDOM from 'react-dom/client';
 import React from 'react';
 import Tues from "./tues.js";
 import Preview from './preview.js';
 import { data } from "./fetched_data.js";
 
-/* routes */
 let page_contents;
 
-// remove '/Tues' after moving from gh pages domain to custom domain
-if (window.location.pathname === '/Tues/' || 
-    window.location.pathname === '/Tues/index.html' ||
-    window.location.pathname === '/Tues/index')
+const hostname_prefix = '/Tues';
+
+if (window.location.pathname === `${hostname_prefix}/` || 
+    window.location.pathname === `${hostname_prefix}/index.html` ||
+    window.location.pathname === `${hostname_prefix}/index`)
 {
-    page_contents = <Tues panels={data}/>;
+    page_contents = <Tues panels={data} displayErrors={false}/>;
 }
-else if (window.location.pathname === '/Tues/preview.html' ||
-         window.location.pathname === '/Tues/preview')
+else if (window.location.pathname === `${hostname_prefix}/preview.html` ||
+         window.location.pathname === `${hostname_prefix}/preview`)
 {
     page_contents = <Preview/>;
 }
