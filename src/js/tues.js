@@ -73,6 +73,10 @@ class Vid extends React.Component {
 }
 
 function PanelMedia(props) {
+  if (props.media.error === true) {
+    return <Err/>;
+  }
+
   switch ( props.media.type ) {
     case  constants.mediaTypes.IMGS:
       if (props.media.content.autoLoopDelay > 0) {
@@ -102,6 +106,10 @@ function LeftImg(props) {
 }
 
 function PanelText(props) {
+  if (props.content.error === true) {
+    return <Err/>;
+  }
+
   if (props.content.text.contents.find(elm => elm.content.length > 1))
   {console.warn('Might have missed some text content?!'); console.log(props);}
 
@@ -139,6 +147,10 @@ function PanelBanner(props) {
 }
 
 function PanelTitle(props) {
+  if (props.name.error === true) {
+    return <Err/>;
+  }
+
   if ( props.name.display === true ) {
     return <h1 className="panel-title">{props.name.name}</h1>;
   }
@@ -151,53 +163,63 @@ function isPanelValid(panel) {
   {
     ret.errors = true;
     ret.errMsgs.push(panel.panelName.errorMsg);
-    ret.errComponents.push("There was an error in the title");
+    ret.errComponents.push("There is something wrong with the title");
   }
   if (panel.text.error === true)
   {
     ret.errors = true;
     ret.errMsgs.push(panel.text.errorMsg);
-    ret.errComponents.push("There was an error in the text");
+    ret.errComponents.push("There is something wrong with the text");
   }
   if (panel.media.error === true)
   {
     ret.errors = true;
     ret.errMsgs.push(panel.media.errorMsg);
-    ret.errComponents.push("There was an error with the images or video");
+    ret.errComponents.push("There is something wrong with the images or video");
   }
   return ret;
 }
 
+function Err(props) {
+  if (gDisplayErrs === true) {return (<p><i>error</i></p>);}
+  else {return null;}
+}
+
 function PanelError(props) {
   let summary;
-  if (props.error.errMsgs.length === 1) {
-    summary = `found an error in the panel '${props.panelData.panelName.name}'`;
-  } else if ( props.error.errMsgs.length > 1 ) {
-    summary = `found errors in the panel '${props.panelData.panelName.name}'`;
+
+  const err = isPanelValid(props.panelData);
+  if (err.errors === false) {return null;}
+
+  if (err.errMsgs.length === 1) {
+    summary = `Error in '${props.panelData.panelName.name}'`;
+  } else if ( err.errMsgs.length > 1 ) {
+    summary = `Errors in '${props.panelData.panelName.name}'`;
   }
   
-  if (props.display === true) {
+  if (props.panelData.panelName.error === false) {
+    console.log(summary);
+  }
+  err.errComponents.forEach(msg => console.log(msg));
+  err.errMsgs.forEach(err => console.error(err));
+
+  if (gDisplayErrs === true) {
     let ret = [];
     let key = 0;
     if (props.panelData.panelName.error === false) {
       ret.push(<h1 key={key}>{summary}</h1>)
       key++;
     }
-    props.error.errComponents.forEach((msg, i) => {ret.push(<p key={key+i} style={{fontWeight: 'bold'}}>{msg}</p>)});
-    key += props.error.errComponents.length;
-    props.error.errMsgs.forEach((err, i) => {ret.push(<p key={key+i} style={{fontWeight: 'bold'}}>{err}</p>)});
-    key += props.error.errMsgs.length;
+    err.errComponents.forEach((msg, i) => {ret.push(<p key={key+i} style={{fontWeight: 'bold'}}>{msg}</p>)});
+    key += err.errComponents.length;
+    err.errMsgs.forEach((err, i) => {ret.push(<p key={key+i}>{err}</p>)});
+    key += err.errMsgs.length;
     return (
-      <div style={{width: '100vw', height: '100vh', border: '5px solid red'}}>
+      <div style={{border: '5px solid red'}}>
         {ret}
       </div>
     )
   } else {
-    if (props.panelData.panelName.error === false) {
-      console.log(summary);
-    }
-    props.error.errComponents.forEach(msg => console.log(msg));
-    props.error.errMsgs.forEach(err => console.error(err));
     return null;
   }
 }
@@ -205,17 +227,9 @@ function PanelError(props) {
 function Panel(props) {
   let panelData = props.panel;
 
-  const err = isPanelValid(panelData);
-  if (err.errors === true) {
-    return (<PanelError 
-      error={err} 
-      display={props.displayError} 
-      panelData={panelData}/>
-    )
-  }
-
   let panel = (
     <div className="panel">
+      <PanelError panelData={panelData}/>
       <div 
         className="left-panel"
         style={{width: `calc(var(--column-size) * ${props.columns.leftPanel})`}}
@@ -242,6 +256,10 @@ const Tues = props => {
   let content = [];
   let tuesData;
 
+  if (props.displayErrors === true) {
+    gDisplayErrs = true;
+  }
+
   tuesData = {
     panelSizes: {leftPanel: constants.PANEL_COLUMNS, rightPanel: constants.PANEL_COLUMNS},
     panels: props.panels
@@ -253,12 +271,13 @@ const Tues = props => {
         panel={panel} 
         key={i+1}
         columns={tuesData.panelSizes}
-        displayError={props.displayErrors}
       />
     )
   }));
   
   return content;
 }
+
+let gDisplayErrs = false;
 
 export default Tues;
