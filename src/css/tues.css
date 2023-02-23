@@ -3,8 +3,13 @@ body, html {
     width: 100vw;
     height: 100vh;
     margin: 0px;
+    margin-top: 20px;
     padding: 0px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+p {
+    font-size: 2.5vh;
 }
 
 .banner {
@@ -23,6 +28,7 @@ body, html {
     position: relative;
 }
 
+/* the left and right sides of the panel */
 .left-panel, .right-panel {
     display: inline-block;
     position: absolute;
@@ -30,10 +36,29 @@ body, html {
     margin-top: 5vw;
     padding: 0px;
     height: 90vh;
+    width: calc( var(--column-size) * var(--num-columns-per-side) );
+}
+
+/* move the right panel towards the left by a distance that is equal to the size 
+   of the left panel */
+.right-panel {
+    left: calc( var(--num-columns-per-side) * var(--column-size) );
+}
+
+.small-screen-title {display: none;}
+.large-screen-title {display: block;}
+
+.text-img {
+    width: calc( var(--num-coloumns-small-img) * var(--column-size) );
+}
+
+.text {
+    width: calc( var(--column-size) * var(--num-columns-main-text) );
 }
 
 .media {
-    width: 100%; max-height: 100%;
+    max-height: 100%;
+    width: calc( var(--column-size) * var(--num-columns-main-media) );
 }
 
 img.media {
@@ -41,14 +66,103 @@ img.media {
 }
 
 .panel-title {
-    /* font-weight: 200; */
     margin-top: 0px;
 }
 
 :root {                     
     /* left and right margins of 1/14 (7 %) of screen width == 7 vw         *
-    * between margins are 6 columns 1/7 (14 %) of screen width == 14 vw    *
-    *          1/14 | 1/7 | 1/7 | 1/7 | 1/7 | 1/7 | 1/7 | 1/4              */
+    * between margins are 6 columns 1/7 (14 %) of screen width == 14 vw     *
+    *          1/14 | 1/7 | 1/7 | 1/7 | 1/7 | 1/7 | 1/7 | 1/4               */
     --column-size: calc(100vw / 7);
-    --margin-size: calc(var(--column-size) / 2)
+    --margin-size: calc(var(--column-size) / 2);
+                                    /* number of in each panel for the: */
+    --num-columns-per-side:  3;     /*  - containers on each side (its split in two) */
+    --num-coloumns-small-img: 0.5;  /*  - small img on the left */
+    --num-columns-main-text: 2;     /*  - text in each panel */
+    --num-columns-main-media: 3;    /*  - main vid or pic */
+}
+
+/* Adjust layout of all screens less than 900px */
+@media only screen and (max-width: 900px)
+{
+    :root {
+        --num-columns-per-side: 6;
+        --num-columns-main-text: 6;
+        --num-columns-main-media: 6;
+        --num-coloumns-small-img: 1.5;
+    }
+
+    h1 {
+        font-size: 8vw;
+    }
+
+    p {
+        font-size: 4vw;
+    }
+
+    .banner {
+        margin-bottom: calc(var(--margin-size) / 2);
+    }
+
+    .panel {
+        height: fit-content;
+    }
+
+    .right-panel {
+        left: calc( 0 * var(--column-size) );
+        height: fit-content;
+        margin-bottom: calc(var(--margin-size) / 4);
+        margin-top: 0px;
+    }
+    .left-panel {
+        margin-top: calc(var(--margin-size) / 4);
+    }
+
+    .left-panel, .right-panel {
+        display: inline-block;
+        position: relative;
+        height: fit-content;
+    }
+
+    .small-screen-title {
+        display: block; 
+        margin-left: var(--margin-size);
+        margin-bottom: calc(var(--margin-size) / 4);
+    }
+    .large-screen-title {display: none;}
+
+    .media {
+        max-height: 98vh;
+        max-width: calc( var(--column-size) * var(--num-columns-main-media) );
+        width: initial;
+        display: inline-block;
+    }
+}
+
+/*
+    Override a couple of above settings when screen is more than 650px wide.
+    This is to deal with a small screen such as a window taking up only part of 
+    a laptop screen.
+*/
+@media only screen and (min-width: 650px) and (max-width: 900px)
+{
+    :root {
+        --num-coloumns-small-img: 1;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    p {
+        font-size: medium;
+    }
+}
+
+/* for big screens make the body text a little smaller */
+@media only screen and (min-width: 1500px)
+{
+    p {
+        font-size: 2vh;
+    }
 }

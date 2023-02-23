@@ -18,13 +18,7 @@ a prop to the `Tues` React component (src/js/tues.js).
 
 ## TODO
 
-* Add preview page - in progress - done?
-    * Restructure to use webpack and build with babel
-    * Update workflows for new build scripts (remember to include the new env var)
-    * Add form to get CPA access token
-* Make mobile friendly
 * Sort out custom domain
 * Add favicon
 * Add License
-* replace any width: {width} with a class: {class}, apply the style with a css 
-  class instead, use media queries to adjust layout for smaller screens
+* Investigate alternitive methods of hosting videos

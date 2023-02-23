@@ -16,6 +16,7 @@ class ImgLoop extends React.Component {
 
   componentDidMount() {
     setInterval(this.tick, this.props.images.content.autoLoopDelay*1000);
+    handle_aspect_ratio(mq);
   }
 
   tick() {
@@ -29,11 +30,10 @@ class ImgLoop extends React.Component {
   render() {
     const ret = this.props.images.content.urls.map(
       (url, index) => <img
-        className="media"
+        className={`media img-loop ${(index == 0) ? 'first-image-in-loop' : ''}`}
         src={url}
         key={index}
         style={{
-          width: `calc(var(--column-size)*${this.props.images.width})`,
           visibility: (index == this.state.imgIndex) ? "visible" : "hidden" 
         }}
       />
@@ -61,7 +61,6 @@ class Vid extends React.Component {
   render() {
     return (<video 
       className="media"
-      style={{width: `calc(var(--column-size)*${this.props.media.width})`}}
       poster={this.props.media.content.thumbnail}
       onMouseOver={this.showControls}
       onMouseOut={this.hideControls}
@@ -97,7 +96,6 @@ function LeftImg(props) {
       <img 
         className="text-img"
         src={props.content.pic.path}
-        style={{width: `calc(var(--column-size)*${props.content.pic.width})`}}
         key={0}
       />);
   } else {
@@ -114,15 +112,7 @@ function PanelText(props) {
   {console.warn('Might have missed some text content?!'); console.log(props);}
 
   let text = props.content.text.contents.map( (elm, i) => {
-    return (
-      <p 
-        style={{width: `calc(var(--column-size)*${props.content.text.width})`}}
-        className="text"
-        key={i}
-      >
-        {elm.content[0].value}
-      </p>
-    )
+    return ( <p  className="text" key={i}>{elm.content[0].value}</p> );
   })
   return( <>{text}</> )
 }
@@ -152,7 +142,7 @@ function PanelTitle(props) {
   }
 
   if ( props.name.display === true ) {
-    return <h1 className="panel-title">{props.name.name}</h1>;
+    return <h1 className={`panel-title ${props.screenClass}`}>{props.name.name}</h1>;
   }
   return null;
 }
@@ -230,21 +220,14 @@ function Panel(props) {
   let panel = (
     <div className="panel">
       <PanelError panelData={panelData}/>
-      <div 
-        className="left-panel"
-        style={{width: `calc(var(--column-size) * ${props.columns.leftPanel})`}}
-      >
-        <LeftImg content={panelData.text}/>
-        <PanelTitle name={panelData.panelName}/>
-        <PanelText content={panelData.text}/>
-      </div>
-      <div
-        className="right-panel"
-        style={{
-          width: `calc(var(--column-size) * ${props.columns.rightPanel})`,
-          left: `calc(${props.columns.leftPanel}*var(--column-size))`}}
-      >
+      <PanelTitle name={panelData.panelName} screenClass="small-screen-title"/>
+      <div className="right-panel">
         <PanelMedia media={panelData.media}/>
+      </div>
+      <div className="left-panel">
+        <LeftImg content={panelData.text}/>
+        <PanelTitle name={panelData.panelName} screenClass="large-screen-title"/>
+        <PanelText content={panelData.text}/>
       </div>
     </div>
   );
@@ -277,6 +260,33 @@ const Tues = props => {
   
   return content;
 }
+
+/** handle layout in portrait mode */
+async function handle_aspect_ratio(mq) {
+  if (mq.matches) {
+    // in portrait
+    var img_loops = document.getElementsByClassName("first-image-in-loop");
+    for (var i = 0; i < img_loops.length; i++) {
+      await img_loops[i].decode();
+      img_loops[i].parentNode.style.height = `${img_loops[i].offsetHeight}px`;
+    }
+  } else {
+    // in landscape
+    var img_loops = document.getElementsByClassName("first-image-in-loop");
+    for (var i = 0; i < img_loops.length; i++) {
+      img_loops[i].parentNode.style.height = ``;
+    }
+  }
+}
+
+var mq = window.matchMedia("screen and (max-width: 900px)");
+mq.addEventListener("change", handle_aspect_ratio);
+
+function reportWindowSize() {
+  handle_aspect_ratio(mq);
+}
+
+window.onresize = reportWindowSize;
 
 let gDisplayErrs = false;
 
